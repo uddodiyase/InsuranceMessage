@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Message Generator</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --background-color: #f5f7fa;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--card-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+        }
+
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-whatsapp {
+            background-color: #25D366;
+            margin-left: 10px;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #128C7E;
+        }
+
+        .btn-copy {
+            background-color: #6c757d;
+        }
+
+        .btn-copy:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-load {
+            background-color: #6f42c1;
+        }
+
+        .btn-load:hover {
+            background-color: #5a2d9a;
+        }
+
+        .btn-reset {
+            background-color: #dc3545;
+        }
+
+        .btn-reset:hover {
+            background-color: #c82333;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .btn-whatsapp {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="logo.jpg" alt="Company Logo" class="logo">
+            <div class="company-name">Yash Insurance Services</div>
+        </div>
+        
+        <h1>Insurance Message Generator</h1>
+        
+        <div class="form-group">
+            <label for="company">Select Company:</label>
+            <select id="company" onchange="loadTypes()" disabled>
+                <option value="">-- Select Company --</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="type">Select Insurance Type:</label>
+            <select id="type" onchange="loadPlans()" disabled>
+                <option value="">-- Select Type --</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="plan">Select Plan:</label>
+            <select id="plan" onchange="showMessage()" disabled>
+                <option value="">-- Select Plan --</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="message">Message:</label>
+            <textarea id="message" readonly placeholder="Select a plan to view the message"></textarea>
+        </div>
+        
+        <div class="button-group">
+            <div>
+                <button class="btn btn-copy" onclick="copyMessage()">Copy Message</button>
+                <button class="btn btn-whatsapp" onclick="sendToWhatsApp()">Send via WhatsApp</button>
+            </div>
+            <button class="btn btn-reset" onclick="resetSelections()">Reset Selections</button>
+        </div>
+    </div>
+    
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading data...</p>
+    </div>
+
+    <script>
+        // Global variable to store all insurance data
+        let insuranceData = [];
+        
+        // Google Sheets configuration
+       // const sheetId = '19BBku6R50w4t9dPF67faUjrB0VcGvoynhOasjDOV5yc'; //Uday Account
+        const sheetId = '1XBxDImYFnSq0j1C7vDk4ET4nBn1deI58yuW3wjxx0vM' //Yash Account
+        const apiKey = 'AIzaSyAXNaQ1d3jhixPTvplBoFNVlEqhzy_vjvY';
+        
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', fetchData);
+        
+        async function fetchData() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                
+                const sheetUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1?key=${apiKey}`;
+                const response = await fetch(sheetUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const json = await response.json();
+                processData(json.values);
+                
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Data loading failed:', error);
+                document.getElementById('loading').style.display = 'none';
+                alert('Failed to load data from Google Sheets. Please try again later.');
+            }
+        }
+        
+        function processData(rows) {
+            if (!rows || rows.length === 0) {
+                throw new Error('No data found in the sheet');
+            }
+            
+            // Extract headers (first row)
+            const headers = rows[0];
+            
+            // Convert rows to objects
+            insuranceData = rows.slice(1).map(row => {
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = row[index] || '';
+                });
+                return obj;
+            });
+            
+            // Check if data has required columns
+            if (insuranceData.length > 0) {
+                const firstRow = insuranceData[0];
+                if (!('Company' in firstRow) || !('Type' in firstRow) || !('Plan' in firstRow) || !('Message' in firstRow)) {
+                    throw new Error('Google Sheet must have columns: Company, Type, Plan, Message');
+                }
+            }
+            
+            // Populate companies dropdown
+            const companies = [...new Set(insuranceData.map(item => item.Company))];
+            const companySelect = document.getElementById('company');
+            
+            companySelect.innerHTML = '<option value="">-- Select Company --</option>';
+            companies.forEach(company => {
+                const option = document.createElement('option');
+                option.value = company;
+                option.textContent = company;
+                companySelect.appendChild(option);
+            });
+            
+            companySelect.disabled = false;
+            document.getElementById('type').disabled = true;
+            document.getElementById('plan').disabled = true;
+            document.getElementById('message').value = '';
+        }
+        
+        function loadTypes() {
+            const company = document.getElementById('company').value;
+            const typeSelect = document.getElementById('type');
+            
+            // Reset and disable dependent dropdowns
+            typeSelect.innerHTML = '<option value="">-- Select Type --</option>';
+            typeSelect.disabled = !company;
+            
+            document.getElementById('plan').innerHTML = '<option value="">-- Select Plan --</option>';
+            document.getElementById('plan').disabled = true;
+            document.getElementById('message').value = '';
+            
+            if (company) {
+                // Filter types for selected company
+                const types = [...new Set(
+                    insuranceData
+                        .filter(item => item.Company === company)
+                        .map(item => item.Type)
+                )];
+                
+                types.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    typeSelect.appendChild(option);
+                });
+                
+                typeSelect.disabled = false;
+            }
+        }
+        
+        function loadPlans() {
+            const company = document.getElementById('company').value;
+            const type = document.getElementById('type').value;
+            const planSelect = document.getElementById('plan');
+            
+            // Reset plan dropdown and message
+            planSelect.innerHTML = '<option value="">-- Select Plan --</option>';
+            planSelect.disabled = !type;
+            document.getElementById('message').value = '';
+            
+            if (company && type) {
+                // Filter plans for selected company and type
+                const plans = insuranceData
+                    .filter(item => item.Company === company && item.Type === type)
+                    .map(item => ({ plan: item.Plan, message: item.Message }));
+                
+                plans.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.plan;
+                    option.textContent = item.plan;
+                    option.dataset.message = item.message;
+                    planSelect.appendChild(option);
+                });
+                
+                planSelect.disabled = false;
+            }
+        }
+        
+        function showMessage() {
+            const planSelect = document.getElementById('plan');
+            const selectedOption = planSelect.options[planSelect.selectedIndex];
+            
+            if (selectedOption && selectedOption.dataset.message) {
+                document.getElementById('message').value = selectedOption.dataset.message;
+            } else {
+                document.getElementById('message').value = '';
+            }
+        }
+        
+        function copyMessage() {
+            const message = document.getElementById('message');
+            message.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const originalText = document.querySelector('.btn-copy').textContent;
+            document.querySelector('.btn-copy').textContent = 'Copied!';
+            setTimeout(() => {
+                document.querySelector('.btn-copy').textContent = originalText;
+            }, 2000);
+        }
+        
+        function sendToWhatsApp() {
+            const message = document.getElementById('message').value;
+            if (message) {
+                const encodedMessage = encodeURIComponent(message);
+                window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+            } else {
+                alert('Please select a plan to generate a message first.');
+            }
+        }
+        
+        function resetSelections() {
+            // Reset all dropdowns and message
+            document.getElementById('company').selectedIndex = 0;
+            document.getElementById('type').innerHTML = '<option value="">-- Select Type --</option>';
+            document.getElementById('type').disabled = true;
+            document.getElementById('plan').innerHTML = '<option value="">-- Select Plan --</option>';
+            document.getElementById('plan').disabled = true;
+            document.getElementById('message').value = '';
+        }
+    </script>
+</body>
+</html>
